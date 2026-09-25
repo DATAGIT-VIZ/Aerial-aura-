@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local Netlify folder
+.netlify
+
+# Raw 3D model archives
+*.zip
+fpv-goggles.glb./
+
+# Large binary assets (serve via CDN or Git LFS)
+/public/drone-frames/
+/public/video/
