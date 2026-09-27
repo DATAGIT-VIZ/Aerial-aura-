@@ -749,8 +749,10 @@ const AERIAL_AURA_OPTIONS: Partial<HyperspeedOptions> = {
     background:    0x000000,
     shoulderLines: 0x1a1f25,
     brokenLines:   0x1a1f25,
-    leftCars:  [0xC1682E, 0xE0985F, 0x8B4020],
-    rightCars: [0x59D6F2, 0x2E8FA8, 0x1B5F7A],
+    // copper brand + drone engine glow: deep crimson → brand copper → vivid amber
+    leftCars:  [0x8B1208, 0xC1682E, 0xE84A18],
+    // sky brand + drone propeller teal: dark teal → brand sky → bright cyan
+    rightCars: [0x0D6E94, 0x59D6F2, 0x8AE8FF],
     sticks:    0x59D6F2,
   },
 };
