@@ -1,8 +1,8 @@
 import type { PortfolioItem } from '@/content/portfolio';
 
-type Props = { item: PortfolioItem };
+type Props = { item: PortfolioItem; index: number };
 
-export default function Card({ item }: Props) {
+export default function Card({ item, index }: Props) {
   const pathD: Record<string, string> = {
     'alpine-chalet':    'M -20,300 C 80,250 120,340 200,180 S 320,60 340,20',
     'lakeside-villa':   'M -20,80 C 100,120 140,20 260,90 S 320,300 340,340',
@@ -21,19 +21,22 @@ export default function Card({ item }: Props) {
 
   const accent = accentMap[item.category] ?? 'var(--sky)';
 
+  const n = String(index).padStart(2, '0');
+
   return (
     <article
       className="card"
       style={{ '--card-accent': accent } as React.CSSProperties}
     >
       <div className="card__art" />
+      <span className="card__n" aria-hidden="true">{n}</span>
       <svg className="card__path" viewBox="0 0 300 375" aria-hidden="true">
         <path d={pathD[item.id] ?? 'M -20,200 C 100,100 200,300 340,200'} />
       </svg>
       <span className="card__tag">{item.category}</span>
       <div className="card__play" aria-hidden="true" />
       <div className="card__meta">
-        <div className="card__title">{item.title}</div>
+        <h3 className="card__title">{item.title}</h3>
         <div className="card__log">{item.flightLog}</div>
       </div>
     </article>

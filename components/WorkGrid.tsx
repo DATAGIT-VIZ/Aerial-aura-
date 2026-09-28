@@ -18,9 +18,9 @@ export default function WorkGrid() {
             View all flights →
           </Link>
         </div>
-        <div className="grid">
-          {portfolio.map(item => (
-            <Card key={item.id} item={item} />
+        <div className="work__grid">
+          {portfolio.map((item, i) => (
+            <Card key={item.id} item={item} index={i + 1} />
           ))}
         </div>
       </div>
