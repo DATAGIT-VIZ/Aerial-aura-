@@ -9,6 +9,7 @@ export default function ContactCTA() {
     <section className="section contact" id="contact">
       <div className="wrap contact__grid">
 
+        {/* Left: headline + WhatsApp CTA */}
         <div className="contact__left">
           <p className="eyebrow">Get in touch</p>
           <h2 className="display contact__title">File a<br />flight plan</h2>
@@ -34,34 +35,83 @@ export default function ContactCTA() {
           </div>
         </div>
 
+        {/* Right: Netlify contact form */}
         <div className="contact__right">
-          <div className="contact__info-block">
-            <dl className="contact__dl">
-              <div className="contact__row">
-                <dt>Based in</dt>
-                <dd>Switzerland</dd>
+          <form
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            data-netlify-honeypot="bot-field"
+            className="contact__form"
+          >
+            <input type="hidden" name="form-name" value="contact" />
+            <input type="hidden" name="bot-field" />
+
+            <div className="contact__row-fields">
+              <div className="contact__field">
+                <label className="contact__label" htmlFor="cf-name">Name</label>
+                <input
+                  id="cf-name"
+                  name="name"
+                  type="text"
+                  className="contact__input"
+                  placeholder="Your name"
+                  required
+                />
               </div>
-              <div className="contact__row">
-                <dt>Available</dt>
-                <dd>Alps &amp; EU-wide</dd>
+              <div className="contact__field">
+                <label className="contact__label" htmlFor="cf-email">Email</label>
+                <input
+                  id="cf-email"
+                  name="email"
+                  type="email"
+                  className="contact__input"
+                  placeholder="you@email.com"
+                  required
+                />
               </div>
-              <div className="contact__row">
-                <dt>Instagram</dt>
-                <dd><Link href="#" className="contact__link">@handle</Link></dd>
+            </div>
+
+            <div className="contact__row-fields">
+              <div className="contact__field">
+                <label className="contact__label" htmlFor="cf-type">Project type</label>
+                <select id="cf-type" name="type" className="contact__input contact__select">
+                  <option value="">Select…</option>
+                  <option value="Wedding">Wedding</option>
+                  <option value="Real Estate">Real Estate</option>
+                  <option value="Brand">Brand film</option>
+                  <option value="Freestyle">Freestyle / FPV</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
-              <div className="contact__row">
-                <dt>YouTube</dt>
-                <dd><Link href="#" className="contact__link">/channel</Link></dd>
+              <div className="contact__field">
+                <label className="contact__label" htmlFor="cf-date">Shoot date</label>
+                <input
+                  id="cf-date"
+                  name="date"
+                  type="text"
+                  className="contact__input"
+                  placeholder="e.g. June 2026"
+                />
               </div>
-              <div className="contact__row">
-                <dt>Email</dt>
-                <dd><Link href={`mailto:${MAILTO}`} className="contact__link">{MAILTO}</Link></dd>
-              </div>
-            </dl>
-            <p className="contact__note">
-              Prefer a call? Drop a WhatsApp with a good time and I&apos;ll ring you back.
-            </p>
-          </div>
+            </div>
+
+            <div className="contact__field">
+              <label className="contact__label" htmlFor="cf-msg">Details</label>
+              <textarea
+                id="cf-msg"
+                name="message"
+                className="contact__input contact__textarea"
+                placeholder="Location, special requirements, anything else…"
+                rows={4}
+                required
+              />
+            </div>
+
+            <button type="submit" className="btn btn--solid contact__submit">
+              Send flight plan →
+            </button>
+          </form>
         </div>
 
       </div>
