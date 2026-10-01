@@ -743,6 +743,8 @@ const AERIAL_AURA_OPTIONS: Partial<HyperspeedOptions> = {
   carLightsFade: 0.4,
   totalSideLightSticks: 20,
   lightPairsPerRoadWay: 40,
+  movingAwaySpeed:   [120, 160],
+  movingCloserSpeed: [-240, -320],
   colors: {
     roadColor:     0x080A0C,
     islandColor:   0x0B0D10,
