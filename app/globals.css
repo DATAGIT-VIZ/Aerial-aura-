@@ -1338,6 +1338,146 @@ a { color: inherit; text-decoration: none; }
 .legal-page__body p { color: var(--dim); font-size: 0.94rem; line-height: 1.8; margin-bottom: 0.9em; }
 .legal-page__body a { color: var(--sky); text-decoration: underline; text-underline-offset: 3px; }
 
+/* ════════════════════════════════════════════
+   MOBILE OVERHAUL  ≤ 600px
+   ════════════════════════════════════════════ */
+@media (max-width: 600px) {
+
+  /* ── Shared: section vertical rhythm ── */
+  .section { padding: 4.5em 5vw; }
+  .testi   { padding: 4em 0; }
+
+  /* ── Buttons ── */
+  .btn { padding: 0.85em 1.25em; font-size: 0.72rem; }
+
+  /* ── Hero ── */
+  .hero { height: 100svh; min-height: 520px; }
+
+  .hero__headline {
+    top: auto;
+    bottom: 6.5em;
+    transform: none;
+  }
+  .hero__line { font-size: clamp(2.6rem, 13vw, 4.8rem); line-height: 0.86; }
+  .hero__line--1 { padding-left: 5vw; }
+  .hero__line--2 { padding-right: 5vw; }
+
+  .drone-anchor {
+    width: 105vw;
+    top: -2%;
+    right: -8vw;
+  }
+
+  /* Hero strip: stack buttons, hide scroll */
+  .hero__strip {
+    padding: 1em 5vw;
+    gap: 0.7em;
+    flex-wrap: wrap;
+  }
+  .hero__strip-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.6em;
+  }
+  .hero__strip-actions .btn {
+    justify-content: center;
+    width: 100%;
+  }
+  .hero__strip-scroll { display: none; }
+
+  /* ── Marquee ── */
+  .marquee__track { animation-duration: 18s; }
+  .marquee__track span { font-size: 1.1rem; padding: 0.85em 1.5em; }
+
+  /* ── Work grid head ── */
+  .work__head { flex-direction: column; align-items: flex-start; gap: 1em; }
+  .work__count { font-size: 2.6rem; }
+  .work__title { font-size: clamp(2rem, 8vw, 2.8rem); }
+  .work__all   { align-self: flex-start; }
+
+  /* ── Cards in single column ── */
+  .work__grid { gap: 2px; }
+  .work__grid .card { aspect-ratio: 16/9 !important; }
+  .card__n { font-size: 2.8rem; }
+
+  /* ── Goggles scene ── */
+  .goggles-scene { height: 280vh; }
+  .goggles-label { top: 3.5em; }
+  .goggles-label__title { font-size: clamp(1.8rem, 6.5vw, 2.8rem); margin-top: 0.3em; }
+
+  /* Goggles HUD: compact */
+  .seq-hud { font-size: 0.58rem; letter-spacing: 0.07em; }
+  .pov-hud__tl { top: 3.5em; left: 1.2em; }
+  .pov-hud__tr { top: 3.5em; right: 1.2em; }
+  .pov-hud__bl { bottom: 1.8em; left: 1.2em; }
+  .pov-hud__br { bottom: 1.8em; right: 1.2em; }
+
+  /* ── About ── */
+  .about__grid { gap: 3em; }
+  .about__visual { max-height: 320px; aspect-ratio: 4/3; }
+  .about__lede { font-size: clamp(1.3rem, 5vw, 1.7rem); }
+  .about__stats { margin-bottom: 1.2em; }
+  .about__stat b { font-size: clamp(1.8rem, 7vw, 2.4rem); }
+
+  /* ── Flight menu ── */
+  .menu__head { flex-direction: column; align-items: flex-start; }
+  .menu__note { display: none; }   /* save space — it's supplementary */
+  .menu__item { padding: 1.8em 0; gap: 0.8em; }
+  .menu__name { font-size: clamp(1.2rem, 5vw, 1.6rem); }
+  .menu__price { font-size: 1.3rem; }
+  .menu__book { font-size: 0.65rem; padding: 0.6em 1em; white-space: nowrap; }
+  .menu__footer-note { font-size: 0.66rem; margin-top: 1.6em; }
+
+  /* ── Testimonials ── */
+  .testi__eyebrow { margin-bottom: 1.5em; }
+  .testi__open-quote { font-size: clamp(3.8rem, 16vw, 6rem); }
+  .testi__featured { padding: 1.8em 0 2em; }
+  .testi__featured-text { font-size: clamp(1.25rem, 5vw, 1.7rem); margin-bottom: 1em; }
+  .testi__card { padding: 1.8em 1.4em; }
+  .testi__text { font-size: 1rem; }
+
+  /* ── Contact ── */
+  .contact__title { font-size: clamp(2.2rem, 9vw, 3.2rem); }
+  .contact__sub { margin-bottom: 1.8em; }
+  .contact__right { padding-top: 0; }
+  .contact__form { gap: 1em; }
+  .contact__row-fields { grid-template-columns: 1fr; gap: 1em; }
+
+  /* ── Footer CTA ── */
+  .footer-cta { padding: 5em 5vw 4em; }
+  .footer-cta__title { font-size: clamp(2.8rem, 12vw, 4.5rem); margin-bottom: 1.2em; }
+
+  /* ── Footer bar ── */
+  .footer-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5em;
+    padding: 1.4em 5vw;
+  }
+  .footer-bar__hud { display: none; }
+
+  /* ── Footer main ── */
+  .footer-main { padding: 3em 5vw; gap: 2em; }
+
+  /* ── Scroll-reveal: less travel on small screens ── */
+  .reveal-pending { transform: translateY(18px); }
+  .reveal-pending .card,
+  .reveal-pending .menu__item,
+  .reveal-pending .testi__card,
+  .reveal-pending .testi__featured,
+  .reveal-pending .about__stat,
+  .reveal-pending .about__cert {
+    transform: translateY(10px);
+  }
+}
+
+/* ── Extra small phones ≤ 380px ── */
+@media (max-width: 380px) {
+  .hero__line { font-size: clamp(2.2rem, 14vw, 3.5rem); }
+  .footer-cta__title { font-size: clamp(2.4rem, 13vw, 3.8rem); }
+  .testi__open-quote { font-size: 3.2rem; }
+}
+
 /* ─── Reduced motion ─── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
