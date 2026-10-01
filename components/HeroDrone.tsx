@@ -6,10 +6,8 @@ export default function HeroDrone() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const rafRef   = useRef<number>(0);
 
-  // Current interpolated values
-  const cur = useRef({ x: 0, y: 0, tilt: 0, scale: 1 });
-  // Target values driven by pointer
-  const tgt = useRef({ x: 0, y: 0, tilt: 0, scale: 1 });
+  const cur = useRef({ x: 0, y: 0, rotZ: 0, rotX: 0, scale: 1 });
+  const tgt = useRef({ x: 0, y: 0, rotZ: 0, rotX: 0, scale: 1 });
 
   useEffect(() => {
     const hero = document.getElementById('top');
@@ -22,39 +20,32 @@ export default function HeroDrone() {
       const hr  = hero.getBoundingClientRect();
       const wr  = wrap.getBoundingClientRect();
 
-      // Pointer relative to hero centre
-      const hcx = hr.left + hr.width  / 2;
-      const hcy = hr.top  + hr.height / 2;
-      const dx  = (e.clientX - hcx) / (hr.width  / 2); // –1 → +1
-      const dy  = (e.clientY - hcy) / (hr.height / 2); // –1 → +1
+      // Normalised pointer position within hero: –1 → +1
+      const nx = (e.clientX - (hr.left + hr.width  / 2)) / (hr.width  / 2);
+      const ny = (e.clientY - (hr.top  + hr.height / 2)) / (hr.height / 2);
 
-      // Drone centre
-      const dcx = wr.left + wr.width  / 2;
-      const dcy = wr.top  + wr.height / 2;
-      const ddx = e.clientX - dcx;
-      const ddy = e.clientY - dcy;
-      const dist = Math.sqrt(ddx * ddx + ddy * ddy);
-      const proximity = Math.max(0, 1 - dist / 500); // 1 = right on top, 0 = far away
+      // Proximity to drone centre (0 = far, 1 = on top)
+      const ddx = e.clientX - (wr.left + wr.width  / 2);
+      const ddy = e.clientY - (wr.top  + wr.height / 2);
+      const proximity = Math.max(0, 1 - Math.sqrt(ddx * ddx + ddy * ddy) / 480);
 
-      // Translate: drone drifts toward cursor (max ±40px)
-      tgt.current.x     = dx * 38;
-      tgt.current.y     = dy * 22;
-      // Tilt: lean in direction of horizontal movement
-      tgt.current.tilt  = dx * 8;
-      // Scale: subtle grow when cursor is close
-      tgt.current.scale = 1 + proximity * 0.06;
+      // Agile: large range + 3D banking
+      tgt.current.x    = nx * 72;          // ±72px horizontal drift
+      tgt.current.y    = ny * 50;          // ±50px vertical drift
+      tgt.current.rotZ = nx * 22;          // roll: bank into horizontal movement
+      tgt.current.rotX = -ny * 14;         // pitch: nose up when cursor above
+      tgt.current.scale = 1 + proximity * 0.1;
     };
 
     const onLeave = () => {
-      tgt.current = { x: 0, y: 0, tilt: 0, scale: 1 };
+      tgt.current = { x: 0, y: 0, rotZ: 0, rotX: 0, scale: 1 };
     };
 
     hero.addEventListener('pointermove', onMove);
     hero.addEventListener('pointerleave', onLeave);
 
-    // RAF lerp loop — runs independently of React renders
     const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-    const EASE = 0.072; // lower = more lag = dreamier
+    const EASE = 0.19; // snappy — reaches target in ~15 frames
 
     const tick = () => {
       const c = cur.current;
@@ -62,14 +53,17 @@ export default function HeroDrone() {
 
       c.x     = lerp(c.x,     t.x,     EASE);
       c.y     = lerp(c.y,     t.y,     EASE);
-      c.tilt  = lerp(c.tilt,  t.tilt,  EASE);
+      c.rotZ  = lerp(c.rotZ,  t.rotZ,  EASE);
+      c.rotX  = lerp(c.rotX,  t.rotX,  EASE);
       c.scale = lerp(c.scale, t.scale, EASE);
 
       const wrap = wrapRef.current;
       if (wrap) {
         wrap.style.transform =
           `translate3d(${c.x.toFixed(2)}px, ${c.y.toFixed(2)}px, 0)` +
-          ` rotate(${c.tilt.toFixed(3)}deg)` +
+          ` perspective(800px)` +
+          ` rotateX(${c.rotX.toFixed(3)}deg)` +
+          ` rotateZ(${c.rotZ.toFixed(3)}deg)` +
           ` scale(${c.scale.toFixed(4)})`;
       }
 
@@ -87,9 +81,7 @@ export default function HeroDrone() {
 
   return (
     <div className="drone-anchor" aria-hidden="true">
-      {/* Outer: receives the pointer-driven lerp transform */}
       <div ref={wrapRef} className="drone-interactive">
-        {/* Inner: the CSS bob animation lives here, layered on top */}
         <div className="drone-bob">
           <video
             ref={videoRef}
