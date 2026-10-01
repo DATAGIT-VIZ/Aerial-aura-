@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function Nav() {
-  const [open, setOpen] = useState(false);
+  const [open,     setOpen]     = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
@@ -15,10 +16,17 @@ export default function Nav() {
     return () => document.removeEventListener('click', close);
   }, [open]);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 72);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const closeMenu = () => setOpen(false);
 
   return (
-    <nav className={`nav${open ? ' nav--open' : ''}`} id="nav">
+    <nav className={`nav${open ? ' nav--open' : ''}${scrolled ? ' nav--scrolled' : ''}`} id="nav">
       <Link href="/" className="nav__mark">
         Aerial<span>_</span>Aura
       </Link>

@@ -9,6 +9,9 @@ export default function Hero() {
       {/* ── Hyperspeed road background ── */}
       <Hyperspeed />
 
+      {/* ── Film grain ── */}
+      <div className="hero__grain" aria-hidden="true" />
+
       {/* ── Atmospheric SVG paths ── */}
       <svg className="hero__path" viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
         <path className="p1" d="M -50,600 C 200,500 300,700 550,450 S 900,150 1250,300" />
