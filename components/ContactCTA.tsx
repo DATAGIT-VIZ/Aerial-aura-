@@ -40,8 +40,7 @@ export default function ContactCTA() {
           <form
             name="contact"
             method="POST"
-            data-netlify="true"
-            data-netlify-honeypot="bot-field"
+            action="/netlify-forms.html"
             className="contact__form"
           >
             <input type="hidden" name="form-name" value="contact" />
