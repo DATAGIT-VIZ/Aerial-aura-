@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 
-const TOTAL  = 72;
+const TOTAL  = 58;
 const FOLDER = '/frames';
 const PAD    = (n: number) => String(n).padStart(3, '0');
 const SRC    = (n: number) => `${FOLDER}/goggles_${PAD(n)}_rgba.png`;

@@ -1090,7 +1090,7 @@ a { color: inherit; text-decoration: none; }
 /* ─── Goggles Reveal — PNG sequence ─── */
 .goggles-scene {
   position: relative;
-  height: 380vh;          /* extra room for zoom phase */
+  height: 520vh;
   background: var(--ink);
 }
 .goggles-scene__sticky {

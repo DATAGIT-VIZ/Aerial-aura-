@@ -51,36 +51,40 @@ export default function GogglesReveal() {
             trigger: sectionRef.current,
             start: 'top top',
             end: 'bottom bottom',
-            scrub: 1.2,
+            scrub: 0.5,           // was 1.2 — much more responsive
             onUpdate: (self) => {
               scrollProg.value = self.progress;
 
-              // ── Phase 2 (78–93 %): CSS zoom punches through the lens ──
-              const zp    = Math.max(0, (self.progress - 0.78) / 0.15);
-              const scale = 1 + zp * 5.5;       // 1× → 6.5×
-              const ty    = zp * -6;
+              // ── Phase 2 (82–96%): CSS zoom punches through the lens ──
+              const zp    = Math.max(0, (self.progress - 0.82) / 0.14);
+              const scale = 1 + zp * 6;          // 1× → 7×
+              const ty    = zp * -5;
               cw.style.transform       = `scale(${scale}) translateY(${ty}%)`;
               cw.style.transformOrigin = '50% 47%';
 
-              // ── Video bleeds in during last 40% of zoom (88%→93%) ──
-              // At 93% the zoom is done — video is fully covering the lens
-              const vp = Math.max(0, Math.min(1, (self.progress - 0.88) / 0.05));
+              // ── Video bleeds in (91%→96%) ──
+              const vp = Math.max(0, Math.min(1, (self.progress - 0.91) / 0.05));
               vw.style.opacity = vp.toString();
 
-              // ── HUD appears just after the video is fully visible ──
-              const hp = Math.max(0, Math.min(1, (self.progress - 0.94) / 0.03));
+              // ── HUD appears after video is up ──
+              const hp = Math.max(0, Math.min(1, (self.progress - 0.96) / 0.03));
               h.style.opacity = hp.toString();
 
-              // Start buffered video playing as zoom begins
-              if (self.progress > 0.80 && vid && vid.paused) {
-                vid.play().catch(() => {});
+              // Video control: always restart from frame 0 on enter, reset on back
+              if (vid) {
+                if (self.progress > 0.83 && vid.paused) {
+                  vid.currentTime = 0;
+                  vid.play().catch(() => {});
+                } else if (self.progress <= 0.80 && !vid.paused) {
+                  vid.pause();
+                  vid.currentTime = 0;
+                }
               }
             },
           },
         });
 
         tl
-          // Label fades out early — only item on the timeline now
           .to(l, { opacity: 0, y: -32, ease: 'power1.in', duration: 1.5 }, 0);
       });
     })();
@@ -143,16 +147,6 @@ export default function GogglesReveal() {
           <div className="pov-hud__br">
             <div>AERIAL AURA</div>
             <div>FPV SYSTEM</div>
-          </div>
-          <div className="pov-hud__center">
-            <svg className="pov-hud__crosshair" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-              <circle cx="32" cy="32" r="28" stroke="rgba(89,214,242,0.28)" strokeWidth="0.8" />
-              <circle cx="32" cy="32" r="6"  stroke="rgba(89,214,242,0.55)" strokeWidth="0.9" />
-              <line x1="4"  y1="32" x2="20" y2="32" stroke="rgba(89,214,242,0.45)" strokeWidth="0.9" />
-              <line x1="44" y1="32" x2="60" y2="32" stroke="rgba(89,214,242,0.45)" strokeWidth="0.9" />
-              <line x1="32" y1="4"  x2="32" y2="20" stroke="rgba(89,214,242,0.45)" strokeWidth="0.9" />
-              <line x1="32" y1="44" x2="32" y2="60" stroke="rgba(89,214,242,0.45)" strokeWidth="0.9" />
-            </svg>
           </div>
         </div>
 
