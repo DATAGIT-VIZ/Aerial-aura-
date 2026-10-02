@@ -476,38 +476,13 @@ a { color: inherit; text-decoration: none; }
     drop-shadow(0 0 70px rgba(11,13,16,0.7));
 }
 
+/* Hyperspeed canvas container — always a background layer */
+#lights { position: absolute; inset: 0; z-index: 0; }
+
 @media (max-width: 900px) {
   .hero__line { font-size: clamp(3rem, 10vw, 7rem); }
   .drone-anchor { width: clamp(300px, 62vw, 520px); top: 3%; right: -4vw; }
   .hero__strip-copy { display: none; }
-}
-@media (max-width: 580px) {
-  /* Shorten hero so drone + text fill the view without a dead zone */
-  .hero {
-    height: 62vh;
-    min-height: 460px;
-  }
-  .drone-anchor {
-    width: 116vw;
-    top: -5%;
-    right: -12vw;
-    left: auto;
-    transform: none;
-  }
-  /* Headline: absolute bottom so it sits above the strip */
-  .hero__headline {
-    top: auto;
-    bottom: 5.5em;
-    transform: none;
-    z-index: 4;
-  }
-  .hero__line { font-size: clamp(2.4rem, 12vw, 4.5rem); line-height: 0.88; }
-  .hero__line--1 { padding-left: 5vw; }
-  .hero__line--2 { padding-right: 5vw; -webkit-text-stroke-width: 1px; }
-  .hero__strip { padding: 1.1em 5vw; gap: 0.8em; opacity: 1; animation: none; }
-  .hero__strip-actions { gap: 0.5em; }
-  .hero__corner { display: none; }
-  .hud { display: none; }
 }
 
 /* ─── Marquee ─── */
@@ -875,7 +850,7 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid var(--line);
   border-top: none;
 }
-@media (max-width: 600px) { .testi__grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .testi__grid { grid-template-columns: 1fr; } /* see full 600px block below */}
 
 .testi__card {
   background: var(--panel); padding: 2.4em 2em;
@@ -1343,37 +1318,63 @@ a { color: inherit; text-decoration: none; }
    ════════════════════════════════════════════ */
 @media (max-width: 600px) {
 
-  /* ── Shared: section vertical rhythm ── */
-  .section { padding: 4.5em 5vw; }
-  .testi   { padding: 4em 0; }
+  /* ── Global: single horizontal padding, tighter vertical rhythm ── */
+  .section { padding: 3.5em 0; }
+  .wrap    { padding-left: 5vw; padding-right: 5vw; }
+  .testi   { padding: 3em 0; }
 
   /* ── Buttons ── */
   .btn { padding: 0.85em 1.25em; font-size: 0.72rem; }
 
-  /* ── Hero ── */
-  .hero { height: 100svh; min-height: 520px; }
-
-  .hero__headline {
-    top: auto;
-    bottom: 6.5em;
-    transform: none;
+  /* ── Hero: flex-column pushes headline+strip to bottom, no dead gap ── */
+  .hero {
+    height: 100svh;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
   }
-  .hero__line { font-size: clamp(2.6rem, 13vw, 4.8rem); line-height: 0.86; }
-  .hero__line--1 { padding-left: 5vw; }
-  .hero__line--2 { padding-right: 5vw; }
 
+  /* Drone: centered, fully in-frame — not cropped on sides */
   .drone-anchor {
-    width: 105vw;
-    top: -2%;
-    right: -8vw;
+    position: absolute;
+    width: 84vw;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -58%);
+    z-index: 3;
   }
 
-  /* Hero strip: stack buttons, hide scroll */
+  /* Hide decorative elements that clutter small screens */
+  .hud         { display: none; }
+  .hero__corner { display: none; }
+
+  /* Headline: relative (flows as flex child at bottom of hero) */
+  .hero__headline {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    transform: none;
+    padding: 2em 5vw 0.4em;
+    z-index: 4;
+  }
+  .hero__line { font-size: clamp(2.8rem, 14vw, 5rem); line-height: 0.84; }
+  .hero__line--1 { padding-left: 0; }
+  .hero__line--2 { padding-right: 0; }
+
+  /* Strip: relative (flows as flex child below headline) */
   .hero__strip {
+    position: relative;
+    bottom: auto;
     padding: 1em 5vw;
     gap: 0.7em;
     flex-wrap: wrap;
+    opacity: 1;
+    animation: none;
+    z-index: 4;
   }
+  .hero__strip-copy { display: none; }
   .hero__strip-actions {
     flex-direction: column;
     width: 100%;
@@ -1389,52 +1390,79 @@ a { color: inherit; text-decoration: none; }
   .marquee__track { animation-duration: 18s; }
   .marquee__track span { font-size: 1.1rem; padding: 0.85em 1.5em; }
 
-  /* ── Work grid head ── */
-  .work__head { flex-direction: column; align-items: flex-start; gap: 1em; }
-  .work__count { font-size: 2.6rem; }
-  .work__title { font-size: clamp(2rem, 8vw, 2.8rem); }
+  /* ── Work section ── */
+  .work__head { flex-direction: column; align-items: flex-start; gap: 0.6em; margin-bottom: 1.6em; }
+  .work__head-left { gap: 0.8em; align-items: center; }
+  .work__count { font-size: 2rem; }
+  .work__title { font-size: clamp(1.8rem, 7.5vw, 2.6rem); }
   .work__all   { align-self: flex-start; }
+  .work__grid { grid-template-columns: 1fr 1fr; gap: 3px; }
+  .work__grid .card { aspect-ratio: 4/3 !important; }
+  .card__n { font-size: 2.2rem; }
 
-  /* ── Cards in single column ── */
-  .work__grid { gap: 2px; }
-  .work__grid .card { aspect-ratio: 16/9 !important; }
-  .card__n { font-size: 2.8rem; }
-
-  /* ── Goggles scene ── */
-  .goggles-scene { height: 280vh; }
-  .goggles-label { top: 3.5em; }
+  /* ── Goggles scene — landscape frame ── */
+  .goggles-scene { height: 150vh; }
+  /* Landscape viewport: 58vw tall, centered in the full-height sticky */
+  .seq-wrap {
+    inset: auto;
+    top: calc(50% - 29vw);
+    left: 0; right: 0;
+    height: 58vw;
+    overflow: hidden;
+  }
+  .seq-video-wrap {
+    inset: auto;
+    top: calc(50% - 29vw);
+    left: 0; right: 0;
+    height: 58vw;
+  }
+  .seq-hud {
+    inset: auto;
+    top: calc(50% - 29vw);
+    left: 0; right: 0;
+    height: 58vw;
+    font-size: 0.52rem;
+    letter-spacing: 0.07em;
+  }
+  /* Position label just above the frame */
+  .goggles-label { top: calc(50% - 29vw - 5em); transform: translateX(-50%); }
   .goggles-label__title { font-size: clamp(1.8rem, 6.5vw, 2.8rem); margin-top: 0.3em; }
-
-  /* Goggles HUD: compact */
-  .seq-hud { font-size: 0.58rem; letter-spacing: 0.07em; }
-  .pov-hud__tl { top: 3.5em; left: 1.2em; }
-  .pov-hud__tr { top: 3.5em; right: 1.2em; }
-  .pov-hud__bl { bottom: 1.8em; left: 1.2em; }
-  .pov-hud__br { bottom: 1.8em; right: 1.2em; }
+  .pov-hud__tl { top: 0.6em; left: 1.2em; }
+  .pov-hud__tr { top: 0.6em; right: 1.2em; }
+  .pov-hud__bl { bottom: 0.6em; left: 1.2em; }
+  .pov-hud__br { bottom: 0.6em; right: 1.2em; }
 
   /* ── About ── */
-  .about__grid { gap: 3em; }
-  .about__visual { max-height: 320px; aspect-ratio: 4/3; }
-  .about__lede { font-size: clamp(1.3rem, 5vw, 1.7rem); }
-  .about__stats { margin-bottom: 1.2em; }
-  .about__stat b { font-size: clamp(1.8rem, 7vw, 2.4rem); }
+  .about__grid { gap: 2.5em; }
+  .about__visual { max-height: 220px; aspect-ratio: 16/9; }
+  .about__lede { font-size: clamp(1.25rem, 5vw, 1.6rem); }
+  .about__body { font-size: 0.92rem; }
+  .about__stats { margin-bottom: 1em; display: flex; flex-wrap: wrap; }
+  .about__stat { min-width: 30%; flex: 1; padding: 1em 0.8em 0.6em 0; }
+  .about__stat b { font-size: clamp(1.6rem, 6.5vw, 2.2rem); }
+  .about__certs { gap: 0.4em; }
 
-  /* ── Flight menu ── */
+  /* ── Flight menu: hide specs to keep each item compact ── */
   .menu__head { flex-direction: column; align-items: flex-start; }
-  .menu__note { display: none; }   /* save space — it's supplementary */
-  .menu__item { padding: 1.8em 0; gap: 0.8em; }
+  .menu__note { display: none; }
+  .menu__specs { display: none; }
+  .menu__item { padding: 1.5em 0; gap: 0.8em; }
   .menu__name { font-size: clamp(1.2rem, 5vw, 1.6rem); }
   .menu__price { font-size: 1.3rem; }
   .menu__book { font-size: 0.65rem; padding: 0.6em 1em; white-space: nowrap; }
   .menu__footer-note { font-size: 0.66rem; margin-top: 1.6em; }
 
   /* ── Testimonials ── */
-  .testi__eyebrow { margin-bottom: 1.5em; }
-  .testi__open-quote { font-size: clamp(3.8rem, 16vw, 6rem); }
-  .testi__featured { padding: 1.8em 0 2em; }
-  .testi__featured-text { font-size: clamp(1.25rem, 5vw, 1.7rem); margin-bottom: 1em; }
-  .testi__card { padding: 1.8em 1.4em; }
-  .testi__text { font-size: 1rem; }
+  .testi__grid { grid-template-columns: 1fr; }
+  .testi__eyebrow { margin-bottom: 1em; }
+  .testi__open-quote { font-size: clamp(5.5rem, 22vw, 8rem); line-height: 0.72; margin-bottom: -0.18em; }
+  .testi__featured { padding: 1.2em 0 1.6em; }
+  .testi__featured-text { font-size: clamp(1.2rem, 4.8vw, 1.6rem); line-height: 1.35; margin-bottom: 0.8em; }
+  .testi__featured-foot { gap: 0.6em; }
+  .testi__card { padding: 1.6em 1.2em; }
+  .testi__text { font-size: 0.93rem; line-height: 1.55; }
+  .testi__name { font-size: 0.72rem; }
+  .testi__role { font-size: 0.62rem; }
 
   /* ── Contact ── */
   .contact__title { font-size: clamp(2.2rem, 9vw, 3.2rem); }
@@ -1444,20 +1472,22 @@ a { color: inherit; text-decoration: none; }
   .contact__row-fields { grid-template-columns: 1fr; gap: 1em; }
 
   /* ── Footer CTA ── */
-  .footer-cta { padding: 5em 5vw 4em; }
-  .footer-cta__title { font-size: clamp(2.8rem, 12vw, 4.5rem); margin-bottom: 1.2em; }
+  .footer-cta { padding: 4em 5vw 3.5em; }
+  .footer-cta__title { font-size: clamp(2.8rem, 12vw, 4.5rem); margin-bottom: 1em; }
+  .footer-cta__sub { margin-bottom: 0.6em; }
 
-  /* ── Footer bar ── */
+  /* ── Footer bar: stretch so copyright text wraps naturally ── */
   .footer-bar {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5em;
-    padding: 1.4em 5vw;
+    align-items: stretch;
+    gap: 0.4em;
+    padding: 1.2em 5vw;
   }
+  .footer-bar > span:first-child { white-space: normal; line-height: 1.5; }
   .footer-bar__hud { display: none; }
 
   /* ── Footer main ── */
-  .footer-main { padding: 3em 5vw; gap: 2em; }
+  .footer-main { padding: 2.5em 5vw; gap: 1.8em; }
 
   /* ── Scroll-reveal: less travel on small screens ── */
   .reveal-pending { transform: translateY(18px); }

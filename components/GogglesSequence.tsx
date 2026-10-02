@@ -87,9 +87,9 @@ export default function GogglesSequence({ scrollProg }: Props) {
       ctx.fillStyle = '#0B0D10';
       ctx.fillRect(0, 0, cssW, cssH);
 
-      // Scale image to fill ~90% of the shorter axis (contained, centred)
-      const fill   = 0.90;
-      const scale  = Math.min(
+      // Mobile canvas is landscape-sized (58vw tall): fill it edge-to-edge
+      const fill  = cssW < 640 ? 1.0 : 0.90;
+      const scale = Math.min(
         (cssW * fill) / img.naturalWidth,
         (cssH * fill) / img.naturalHeight,
       );
