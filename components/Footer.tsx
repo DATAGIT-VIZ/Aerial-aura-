@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -34,10 +35,14 @@ export default function Footer() {
 
         {/* Brand */}
         <div className="footer-brand">
-          <Link href="/" className="footer-logo" aria-label="Aerial Aura home">
-            <span>AERIAL</span>
-            <span className="footer-logo__sep">·</span>
-            <span>AURA</span>
+          <Link href="/" className="footer-logo" aria-label="Aerial Aura Studio — home">
+            <Image
+              src="/logos/logo-horizontal-gold.svg"
+              alt="Aerial Aura Studio"
+              className="footer-logo__img"
+              width={186}
+              height={56}
+            />
           </Link>
           <p className="footer-brand__bio">
             FPV &amp; cinematic drone films for weddings, real estate and

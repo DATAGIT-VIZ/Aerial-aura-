@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Nav() {
   const [open,     setOpen]     = useState(false);
@@ -27,8 +28,15 @@ export default function Nav() {
 
   return (
     <nav className={`nav${open ? ' nav--open' : ''}${scrolled ? ' nav--scrolled' : ''}`} id="nav">
-      <Link href="/" className="nav__mark">
-        Aerial<span>_</span>Aura
+      <Link href="/" className="nav__mark" aria-label="Aerial Aura Studio — home">
+        <Image
+          src="/logos/logo-monogram-gold.svg"
+          alt="Aerial Aura Studio"
+          className="nav__logo"
+          width={73}
+          height={60}
+          priority
+        />
       </Link>
 
       <div className="nav__links" id="navLinks">

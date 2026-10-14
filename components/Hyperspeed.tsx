@@ -724,8 +724,10 @@ class App {
     }
     if (this.hasValidSize) {
       this.timer.update();
-      const delta=this.timer.getDelta();
-      this.render(delta); this.update(delta);
+      // cap delta to 33ms — prevents jump-frame after tab-switch or stall
+      const delta = Math.min(this.timer.getDelta(), 1 / 30);
+      this.update(delta);   // camera/scene state advances first
+      this.render(delta);   // then blit the already-updated frame
     }
     requestAnimationFrame(this.tick);
   }
@@ -746,16 +748,16 @@ const AERIAL_AURA_OPTIONS: Partial<HyperspeedOptions> = {
   movingAwaySpeed:   [55, 75],
   movingCloserSpeed: [-110, -150],
   colors: {
-    roadColor:     0x080A0C,
-    islandColor:   0x0B0D10,
+    roadColor:     0x070809,
+    islandColor:   0x0A0B0D,
     background:    0x000000,
-    shoulderLines: 0x1a1f25,
-    brokenLines:   0x1a1f25,
-    // copper brand + drone engine glow: deep crimson → brand copper → vivid amber
-    leftCars:  [0x8B1208, 0xC1682E, 0xE84A18],
-    // sky brand + drone propeller teal: dark teal → brand sky → bright cyan
-    rightCars: [0x0D6E94, 0x59D6F2, 0x8AE8FF],
-    sticks:    0x59D6F2,
+    shoulderLines: 0x161a1f,
+    brokenLines:   0x161a1f,
+    // gold brand: deep shadow → warm gold → golden-white highlight
+    leftCars:  [0x7E5D22, 0xC99A43, 0xFBEFC4],
+    // gold brand (right): deep shadow → mid gold → golden-white
+    rightCars: [0x6E4E17, 0xD4AF5F, 0xFBEFC4],
+    sticks:    0xC99A43,
   },
 };
 
