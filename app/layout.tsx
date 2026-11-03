@@ -3,6 +3,7 @@ import { Cormorant, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import CustomCursor   from "@/components/CustomCursor";
 import RevealOnScroll from "@/components/RevealOnScroll";
+import SmoothScroll   from "@/components/SmoothScroll";
 
 const cormorant = Cormorant({
   variable: "--font-cormorant",
@@ -49,6 +50,7 @@ export default function RootLayout({
       className={`${cormorant.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <body>
+        <SmoothScroll />
         <CustomCursor />
         <RevealOnScroll />
         {children}
