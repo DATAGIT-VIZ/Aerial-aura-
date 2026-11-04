@@ -1,42 +1,55 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 
-const TOTAL  = 58;
-const FOLDER = '/frames';
-const PAD    = (n: number) => String(n).padStart(3, '0');
-const SRC    = (n: number) => `${FOLDER}/goggles_${PAD(n)}_rgba.png`;
-const URLS   = Array.from({ length: TOTAL }, (_, i) => SRC(i + 1));
+const TOTAL = 58;
+const PAD   = (n: number) => String(n).padStart(3, '0');
+// WebP frames (~25 KB each vs ~180 KB PNG). Phones get an 896px-wide set, which is still
+// 2× the on-screen size there. Source PNGs stay in /frames for re-exporting.
+const urls  = (folder: string) =>
+  Array.from({ length: TOTAL }, (_, i) => `/frames/${folder}/goggles_${PAD(i + 1)}.webp`);
 
-interface Props { scrollProg: { value: number } }
+interface Props {
+  scrollProg: { value: number };
+  turnEnd: number;   // progress at which the turn finishes (holds on the last frame after)
+}
 
-export default function GogglesSequence({ scrollProg }: Props) {
-  const canvasRef  = useRef<HTMLCanvasElement>(null);
-  const imagesRef  = useRef<HTMLImageElement[]>([]);
-  const rafRef     = useRef<number>(0);
-  const frameRef   = useRef<number>(-1);
-  const dprRef     = useRef<number>(1);
+export default function GogglesSequence({ scrollProg, turnEnd }: Props) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
   const [loaded,   setLoaded]   = useState(false);
   const [progress, setProgress] = useState(0);
 
-  // ── Preload all frames ──────────────────────────────────────────────────
+  // ── Preload all frames (after the page's first load, so the hero goes first) ──
   useEffect(() => {
-    let done = 0;
-    const imgs: HTMLImageElement[] = new Array(TOTAL);
+    let cancelled = false;
+    const folder = window.matchMedia('(max-width: 600px)').matches ? 'webp-mobile' : 'webp';
 
-    URLS.forEach((src, i) => {
-      const img = new window.Image();
-      img.decoding = 'async';
-      img.src = src;
-      const finish = () => {
-        imgs[i] = img;
-        done++;
-        setProgress(Math.round((done / TOTAL) * 100));
-        if (done === TOTAL) { imagesRef.current = imgs; setLoaded(true); }
-      };
-      img.onload  = finish;
-      img.onerror = finish;
-    });
-    return () => cancelAnimationFrame(rafRef.current);
+    const start = () => {
+      let done = 0;
+      const imgs: HTMLImageElement[] = new Array(TOTAL);
+      urls(folder).forEach((src, i) => {
+        const img = new window.Image();
+        const finish = () => {
+          if (cancelled) return;
+          imgs[i] = img;
+          done++;
+          setProgress(Math.round((done / TOTAL) * 100));
+          if (done === TOTAL) { imagesRef.current = imgs; setLoaded(true); }
+        };
+        img.onload = () => {
+          // Warm the decode in the background so drawing a frame mid-scroll doesn't stall.
+          // Not awaited: browsers may postpone decode() (e.g. in a background tab).
+          img.decode().catch(() => {});
+          finish();
+        };
+        img.onerror = finish;
+        img.src = src;
+      });
+    };
+
+    if (document.readyState === 'complete') start();
+    else window.addEventListener('load', start, { once: true });
+    return () => { cancelled = true; window.removeEventListener('load', start); };
   }, []);
 
   // ── Draw loop ───────────────────────────────────────────────────────────
@@ -48,64 +61,74 @@ export default function GogglesSequence({ scrollProg }: Props) {
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
-    // Best possible image rendering
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-
-    let lastW = 0, lastH = 0;
+    let raf = 0;
+    let lastW = 0, lastH = 0, lastDpr = 0;
+    let lastPos = -1;
 
     const draw = () => {
-      // Map scroll: 0–80% → frames 0–71, hold on 71 after that
-      const p      = Math.min(scrollProg.value / 0.80, 1);
-      const target = Math.round(p * (TOTAL - 1));
-      const img    = imagesRef.current[target];
+      raf = requestAnimationFrame(draw);
+
+      // Scroll 0→turnEnd turns the goggles through every frame, then holds on the last one.
+      // `pos` is fractional (e.g. 12.4 = frame 12 blended 40% into frame 13).
+      const pos = Math.min(scrollProg.value / turnEnd, 1) * (TOTAL - 1);
 
       const cssW = canvas.clientWidth;
       const cssH = canvas.clientHeight;
       const dpr  = Math.min(window.devicePixelRatio || 1, 2); // cap at 2× for perf
 
-      // Resize canvas backing store when needed — resets ctx transform
-      if (cssW !== lastW || cssH !== lastH || dpr !== dprRef.current) {
+      // Resize the backing store when needed (this resets the context state)
+      if (cssW !== lastW || cssH !== lastH || dpr !== lastDpr) {
         canvas.width  = Math.round(cssW * dpr);
         canvas.height = Math.round(cssH * dpr);
-        ctx.scale(dpr, dpr);
-        // Re-apply quality settings after resize (ctx is reset)
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
-        lastW = cssW; lastH = cssH; dprRef.current = dpr;
-        frameRef.current = -1; // force redraw
+        lastW = cssW; lastH = cssH; lastDpr = dpr;
+        lastPos = -1; // force redraw
       }
 
-      if (!img || target === frameRef.current) {
-        rafRef.current = requestAnimationFrame(draw);
-        return;
-      }
+      if (Math.abs(pos - lastPos) < 0.001) return;
+      lastPos = pos;
 
-      frameRef.current = target;
+      const i0   = Math.floor(pos);
+      const i1   = Math.min(i0 + 1, TOTAL - 1);
+      const frac = pos - i0;
+      const a = imagesRef.current[i0];
+      const b = imagesRef.current[i1];
+      if (!a?.naturalWidth) return;
 
-      // Dark background (image is RGBA transparent)
+      // Dark background (frames are transparent)
       ctx.fillStyle = '#0B0D10';
       ctx.fillRect(0, 0, cssW, cssH);
 
       // Mobile canvas is landscape-sized (58vw tall): fill it edge-to-edge
       const fill  = cssW < 640 ? 1.0 : 0.90;
-      const scale = Math.min(
-        (cssW * fill) / img.naturalWidth,
-        (cssH * fill) / img.naturalHeight,
-      );
-      const dw = img.naturalWidth  * scale;
-      const dh = img.naturalHeight * scale;
+      const scale = Math.min((cssW * fill) / a.naturalWidth, (cssH * fill) / a.naturalHeight);
+      const dw = a.naturalWidth  * scale;
+      const dh = a.naturalHeight * scale;
       const dx = (cssW - dw) / 2;
       const dy = (cssH - dh) / 2;
 
-      ctx.drawImage(img, dx, dy, dw, dh);
-
-      rafRef.current = requestAnimationFrame(draw);
+      // Cross-fade into the next frame for in-between positions — the turn reads as
+      // continuous motion instead of 58 separate steps.
+      ctx.globalAlpha = 1;
+      ctx.drawImage(a, dx, dy, dw, dh);
+      if (frac > 0.01 && b?.naturalWidth && b !== a) {
+        ctx.globalAlpha = frac;
+        ctx.drawImage(b, dx, dy, dw, dh);
+        ctx.globalAlpha = 1;
+      }
     };
 
-    rafRef.current = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [loaded, scrollProg]);
+    // Only run the loop while the canvas is on screen.
+    const observer = new IntersectionObserver(([entry]) => {
+      cancelAnimationFrame(raf);
+      if (entry.isIntersecting) { lastPos = -1; raf = requestAnimationFrame(draw); }
+    });
+    observer.observe(canvas);
+
+    return () => { observer.disconnect(); cancelAnimationFrame(raf); };
+  }, [loaded, scrollProg, turnEnd]);
 
   return (
     <>

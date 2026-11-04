@@ -406,7 +406,10 @@ function resizeRendererToDisplaySize(
   const canvas=renderer.domElement;
   const width=canvas.clientWidth, height=canvas.clientHeight;
   if (width<=0||height<=0) return false;
-  const needResize=canvas.width!==width||canvas.height!==height;
+  // Compare in device pixels — the canvas buffer is CSS size × pixel ratio. Comparing against the
+  // CSS size made this true on every frame on 2×/3× screens, reallocating the canvas 60 times a second.
+  const pr=renderer.getPixelRatio();
+  const needResize=canvas.width!==Math.floor(width*pr)||canvas.height!==Math.floor(height*pr);
   if (needResize) setSize(width,height,false);
   return needResize;
 }
@@ -593,6 +596,7 @@ class App {
   road: Road; leftCarLights: CarLights; rightCarLights: CarLights; leftSticks: LightsSticks;
   fogUniforms: Record<string,{value:any}>;
   fovTarget: number; speedUpTarget: number; speedUp: number; timeOffset: number; hasValidSize: boolean;
+  visible: boolean; observer: IntersectionObserver;
 
   constructor(container: HTMLElement, options: HyperspeedOptions) {
     this.options=options;
@@ -602,8 +606,11 @@ class App {
     this.container=container; this.hasValidSize=false;
     const initW=Math.max(1,container.offsetWidth), initH=Math.max(1,container.offsetHeight);
     this.renderer=new THREE.WebGLRenderer({ antialias:false, alpha:true });
+    // Cap pixel density: thin light streaks look the same at 1.5–2×, and a 3× phone
+    // would otherwise render 2.25× more pixels than needed every frame.
+    const maxRatio=window.matchMedia('(max-width: 600px)').matches ? 1.5 : 2;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio,maxRatio));
     this.renderer.setSize(initW,initH,false);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(this.renderer.domElement);
     this.camera=new THREE.PerspectiveCamera(options.fov,initW/initH,0.1,10000);
     this.camera.position.z=-5; this.camera.position.y=8; this.camera.position.x=0;
@@ -624,6 +631,14 @@ class App {
     this.onContextMenu=this.onContextMenu.bind(this); this.onWindowResize=this.onWindowResize.bind(this);
     window.addEventListener('resize',this.onWindowResize);
     if (container.offsetWidth>0&&container.offsetHeight>0) this.hasValidSize=true;
+    // Stop rendering while the hero is scrolled out of view (saves GPU and battery on phones).
+    this.visible=true;
+    this.observer=new IntersectionObserver(([entry])=>{
+      const wasVisible=this.visible;
+      this.visible=entry.isIntersecting;
+      if (this.visible&&!wasVisible&&!this.disposed) { this.timer.reset(); requestAnimationFrame(this.tick); }
+    });
+    this.observer.observe(container);
   }
 
   onWindowResize() {
@@ -684,7 +699,7 @@ class App {
   render(delta: number) { this.renderer.render(this.scene, this.camera); }
 
   dispose() {
-    this.disposed=true; this.timer.dispose();
+    this.disposed=true; this.timer.dispose(); this.observer.disconnect();
     this.scene.traverse(obj=>{
       const o=obj as unknown as THREE.Mesh;
       if (!o.isMesh) return;
@@ -710,7 +725,7 @@ class App {
   }
 
   tick() {
-    if (this.disposed) return;
+    if (this.disposed||!this.visible) return;   // the observer restarts the loop when visible again
     if (!this.hasValidSize) {
       const w=this.container.offsetWidth, h=this.container.offsetHeight;
       if (w>0&&h>0) {

@@ -48,8 +48,8 @@ next-env.d.ts
 fpv-goggles.glb./
 
 # Large binary assets (serve via CDN or Git LFS)
+# Videos in /public/video/ are committed through Git LFS (see .gitattributes).
 /public/drone-frames/
-/public/video/
 
 # Playwright MCP session files
 .playwright-mcp/

@@ -52,7 +52,11 @@
 
 /* ─── Base ─── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+/* Native smooth scrolling only when Lenis isn't running — the two fight each other. */
+html:not(.lenis) { scroll-behavior: smooth; }
+/* Lenis clips <html> while paused, which breaks position: sticky (the goggles scene pauses
+   Lenis during its scroll lock). Input is blocked in JS instead. */
+html.lenis.lenis-stopped:not(.lenis-autoToggle) { overflow: visible; }
 body {
   background: var(--ink);
   color: var(--paper);
@@ -485,6 +489,7 @@ a { color: inherit; text-decoration: none; }
 }
 .drone-video {
   width: 100%; height: auto;
+  aspect-ratio: 16 / 9;   /* reserve space before the video loads — no layout jump */
   display: block;
   /* cast ink-coloured shadow around all edges — masks light extraction fringe */
   filter:
@@ -1352,16 +1357,24 @@ a { color: inherit; text-decoration: none; }
     justify-content: flex-end;
   }
 
-  /* Drone: centered, fully in-frame — not cropped on sides */
+  /* Drone: fills the free space between the nav and the headline and centres itself in it,
+     so it fits any phone height. Mobile video is cropped tight to the drone (960×448). */
   .drone-anchor {
-    position: absolute;
-    width: 84vw;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    transform: translate(-50%, -58%);
+    position: relative;
+    order: -1;              /* above the headline in the hero's flex column */
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    top: auto; left: auto; right: auto;
+    transform: none;
+    padding: 96px 3vw 0;    /* clear the fixed nav */
     z-index: 3;
   }
+  .drone-bob   { width: 100%; }
+  .drone-video { aspect-ratio: 960 / 448; }
 
   /* Hide decorative elements that clutter small screens */
   .hud         { display: none; }
@@ -1418,7 +1431,9 @@ a { color: inherit; text-decoration: none; }
   .card__n { font-size: 2.2rem; }
 
   /* ── Goggles scene — landscape frame ── */
-  .goggles-scene { height: 150vh; }
+  /* 380vh gives the rotation ~2.8 screens of scroll (was 150vh ≈ half a screen, so one flick
+     skipped the whole turn). */
+  .goggles-scene { height: 380vh; }
   /* Landscape viewport: 58vw tall, centered in the full-height sticky */
   .seq-wrap {
     inset: auto;
@@ -1427,27 +1442,22 @@ a { color: inherit; text-decoration: none; }
     height: 58vw;
     overflow: hidden;
   }
-  .seq-video-wrap {
-    inset: auto;
-    top: calc(50% - 29vw);
-    left: 0; right: 0;
-    height: 58vw;
-  }
+  /* Video + HUD fill the whole screen; the video opens out from a lens-sized strip (clipped in
+     GogglesReveal.tsx). Mobile video is a portrait crop, so object-fit: cover stays sharp. */
+  .seq-video-wrap { inset: 0; }
   .seq-hud {
-    inset: auto;
-    top: calc(50% - 29vw);
-    left: 0; right: 0;
-    height: 58vw;
-    font-size: 0.52rem;
-    letter-spacing: 0.07em;
+    inset: 0;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
   }
   /* Position label just above the frame */
   .goggles-label { top: calc(50% - 29vw - 5em); transform: translateX(-50%); }
   .goggles-label__title { font-size: clamp(1.8rem, 6.5vw, 2.8rem); margin-top: 0.3em; }
-  .pov-hud__tl { top: 0.6em; left: 1.2em; }
-  .pov-hud__tr { top: 0.6em; right: 1.2em; }
-  .pov-hud__bl { bottom: 0.6em; left: 1.2em; }
-  .pov-hud__br { bottom: 0.6em; right: 1.2em; }
+  /* HUD corners: clear the fixed nav at the top and the phone's home bar at the bottom */
+  .pov-hud__tl { top: calc(96px + 1.2em); left: 1.4em; }
+  .pov-hud__tr { top: calc(96px + 1.2em); right: 1.4em; }
+  .pov-hud__bl { bottom: calc(env(safe-area-inset-bottom, 0px) + 2.4em); left: 1.4em; }
+  .pov-hud__br { bottom: calc(env(safe-area-inset-bottom, 0px) + 2.4em); right: 1.4em; }
 
   /* ── About ── */
   .about__grid { gap: 2.5em; }
