@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = 'https://aerialaura.ch';
+  const base = SITE_URL;
   return [
     { url: base,                   lastModified: new Date(), changeFrequency: 'monthly', priority: 1 },
     { url: `${base}/work`,         lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.9 },

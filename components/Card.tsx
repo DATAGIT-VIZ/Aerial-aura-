@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { PortfolioItem } from '@/content/portfolio';
 
 type Props = { item: PortfolioItem; index: number };
@@ -24,8 +25,10 @@ export default function Card({ item, index }: Props) {
   const n = String(index).padStart(2, '0');
 
   return (
-    <article
+    <Link
+      href="/work"
       className="card"
+      aria-label={`${item.title} — open the reel`}
       style={{ '--card-accent': accent } as React.CSSProperties}
     >
       <div className="card__art" />
@@ -39,6 +42,6 @@ export default function Card({ item, index }: Props) {
         <h3 className="card__title">{item.title}</h3>
         <div className="card__log">{item.flightLog}</div>
       </div>
-    </article>
+    </Link>
   );
 }

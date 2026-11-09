@@ -15,7 +15,7 @@ export default function PrivacyPage() {
           <header className="legal-page__header">
             <p className="eyebrow">Legal</p>
             <h1 className="display legal-page__title">Privacy Policy</h1>
-            <p className="legal-page__date">Last updated: September 2026</p>
+            <p className="legal-page__date">Last updated: November 2026</p>
           </header>
 
           <div className="legal-page__body">
@@ -23,8 +23,9 @@ export default function PrivacyPage() {
             <p>Aerial Aura is a sole-trader drone cinematography business operated from Switzerland. References to &ldquo;we&rdquo;, &ldquo;us&rdquo; or &ldquo;our&rdquo; in this policy refer to the operator of this site.</p>
 
             <h2>2. What data we collect</h2>
-            <p>When you contact us via WhatsApp or email, you provide your name, contact details, and any information you choose to include in your message. We do not operate a server-side contact form, so no form data is stored on our servers.</p>
-            <p>We use privacy-friendly analytics (no cookies, no cross-site tracking) to understand how visitors use this site in aggregate. No personally identifiable information is collected through analytics.</p>
+            <p>When you contact us via the contact form, WhatsApp or email, you provide your name, contact details, and any information you choose to include in your message.</p>
+            <p>Messages sent through the contact form are delivered to our inbox by email via our email provider, Resend. The website itself does not store form submissions in a database.</p>
+            <p>This site does not use analytics, advertising trackers or tracking cookies.</p>
 
             <h2>3. How we use your data</h2>
             <p>We use contact information solely to respond to your enquiry and, if you become a client, to manage our working relationship. We do not use it for marketing, and we do not sell or share it with third parties.</p>

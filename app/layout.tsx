@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { SITE_URL } from "@/lib/site";
 import { Cormorant, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import CustomCursor   from "@/components/CustomCursor";
@@ -28,6 +29,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Aerial Aura — Aerial Cinematography",
   description:
     "FPV & cinematic drone films for weddings, real estate and brands — shot, graded and delivered by a former chef who traded the pass for a controller. Based in Switzerland.",
@@ -36,7 +38,15 @@ export const metadata: Metadata = {
     description:
       "FPV & cinematic drone films for weddings, real estate and brands. Based in Switzerland.",
     type: "website",
+    siteName: "Aerial Aura",
+    locale: "en_CH",
   },
+  twitter: { card: "summary_large_image" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0B0D10",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
