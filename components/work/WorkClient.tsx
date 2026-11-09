@@ -1,6 +1,10 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+// Lazy entry: the player's code only downloads when a film is opened
+import MuxPlayer from '@mux/mux-player-react/lazy';
 import { portfolio, PortfolioItem, Category } from '@/content/portfolio';
+import { getLenis } from '@/lib/lenis';
 
 const CATS: ('All' | Category)[] = ['All', 'Weddings', 'Real Estate', 'Freestyle', 'Cinematic'];
 
@@ -24,13 +28,22 @@ function PlaceholderArt({ item }: { item: PortfolioItem }) {
 }
 
 function Lightbox({ item, onClose }: { item: PortfolioItem; onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
     const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', esc);
+    // Freeze the page behind the lightbox (Lenis handles wheel scrolling, body overflow handles touch)
+    const lenis = getLenis();
+    lenis?.stop();
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', esc);
+      lenis?.start();
       document.body.style.overflow = '';
+      previous?.focus();
     };
   }, [onClose]);
 
@@ -43,23 +56,25 @@ function Lightbox({ item, onClose }: { item: PortfolioItem; onClose: () => void 
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="lightbox__inner">
-        <button className="lightbox__close" onClick={onClose} aria-label="Close">✕</button>
+        <button ref={closeRef} className="lightbox__close" onClick={onClose} aria-label="Close">✕</button>
 
         <div className="lightbox__player">
           {item.muxPlaybackId ? (
-            // @ts-expect-error — mux-player custom element
-            <mux-player
-              playback-id={item.muxPlaybackId}
-              metadata-video-title={item.title}
-              accent-color="var(--copper)"
-              style={{ width: '100%', height: '100%' }}
+            <MuxPlayer
+              playbackId={item.muxPlaybackId}
+              streamType="on-demand"
+              thumbnailTime={item.muxThumbnailTime ?? 0}
+              metadata={{ video_title: item.title }}
+              accentColor="#C99A43"
+              style={{ width: '100%', height: '100%', aspectRatio: '16 / 9' }}
             />
           ) : (
             <div className="lightbox__placeholder">
               <PlaceholderArt item={item} />
-              <p className="lightbox__placeholder-msg">
-                Footage coming soon — Mux playback ID not yet set.
-              </p>
+              <div className="lightbox__placeholder-msg">
+                <p>Full film coming soon.</p>
+                <Link href="/contact" className="btn" onClick={onClose}>Ask for a private preview →</Link>
+              </div>
             </div>
           )}
         </div>

@@ -1,10 +1,42 @@
+'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 
 const WA_NUMBER = '41XXXXXXXXX';
 const WA_MSG = encodeURIComponent("Hi, I'd like to enquire about aerial cinematography. Here are my details:");
 const MAILTO  = 'hello@aerialaura.ch';
 
+type Status = 'idle' | 'sending' | 'sent' | 'error';
+
+const ERRORS: Record<string, string> = {
+  invalid:      'Please add your name, a valid email and a few details.',
+  rate_limited: 'Too many messages in a short time. Please try again in a few minutes.',
+};
+const FALLBACK = `Couldn't send right now. Please email ${MAILTO} or message on WhatsApp.`;
+
 export default function ContactCTA() {
+  const [status, setStatus] = useState<Status>('idle');
+  const [error,  setError]  = useState('');
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setStatus('sending'); setError('');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form).entries())),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) { setStatus('sent'); form.reset(); return; }
+      setError(ERRORS[data.error] ?? FALLBACK);
+    } catch {
+      setError(FALLBACK);
+    }
+    setStatus('error');
+  }
+
   return (
     <section className="section contact" id="contact">
       <div className="wrap contact__grid">
@@ -35,16 +67,26 @@ export default function ContactCTA() {
           </div>
         </div>
 
-        {/* Right: Netlify contact form */}
+        {/* Right: contact form (sent by app/api/contact/route.ts) */}
         <div className="contact__right">
+          {status === 'sent' ? (
+            <div className="contact__sent" role="status">
+              <p className="eyebrow">Flight plan received</p>
+              <p className="contact__sent-title display">Thank you — I&apos;ll be in touch within 48 hours.</p>
+              <button type="button" className="btn" onClick={() => setStatus('idle')}>Send another</button>
+            </div>
+          ) : (
           <form
-            name="contact"
             method="POST"
-            action="/netlify-forms.html"
+            action="/api/contact"
             className="contact__form"
+            onSubmit={onSubmit}
           >
-            <input type="hidden" name="form-name" value="contact" />
-            <input type="hidden" name="bot-field" />
+            {/* Spam trap: hidden from people, bots fill it in */}
+            <div className="contact__trap" aria-hidden="true">
+              <label htmlFor="cf-bot">Leave this empty</label>
+              <input id="cf-bot" name="bot-field" type="text" tabIndex={-1} autoComplete="off" />
+            </div>
 
             <div className="contact__row-fields">
               <div className="contact__field">
@@ -55,6 +97,8 @@ export default function ContactCTA() {
                   type="text"
                   className="contact__input"
                   placeholder="Your name"
+                  autoComplete="name"
+                  maxLength={120}
                   required
                 />
               </div>
@@ -66,6 +110,9 @@ export default function ContactCTA() {
                   type="email"
                   className="contact__input"
                   placeholder="you@email.com"
+                  autoComplete="email"
+                  inputMode="email"
+                  maxLength={200}
                   required
                 />
               </div>
@@ -90,7 +137,8 @@ export default function ContactCTA() {
                   name="date"
                   type="text"
                   className="contact__input"
-                  placeholder="e.g. June 2026"
+                  placeholder="e.g. June 2027"
+                  maxLength={80}
                 />
               </div>
             </div>
@@ -103,14 +151,19 @@ export default function ContactCTA() {
                 className="contact__input contact__textarea"
                 placeholder="Location, special requirements, anything else…"
                 rows={4}
+                maxLength={4000}
                 required
               />
             </div>
 
-            <button type="submit" className="btn btn--solid contact__submit">
-              Send flight plan →
+            <button type="submit" className="btn btn--solid contact__submit" disabled={status === 'sending'}>
+              {status === 'sending' ? 'Sending…' : 'Send flight plan →'}
             </button>
+            <p className="contact__error" role="alert" aria-live="assertive">
+              {status === 'error' ? error : ''}
+            </p>
           </form>
+          )}
         </div>
 
       </div>
