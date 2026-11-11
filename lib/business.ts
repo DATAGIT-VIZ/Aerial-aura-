@@ -44,7 +44,7 @@ export const business = {
 
   // ── The pilot
   /** Shown in the About section. Empty uses neutral wording instead. */
-  pilotName: '',
+  pilotName: 'Sydney',
   /** Portrait placed in /public, e.g. '/images/pilot.jpg'. Empty keeps the HUD graphic. */
   pilotPhoto: '',
   /** Optional. FOCA drone operator registration number, shown in the legal notice. */
