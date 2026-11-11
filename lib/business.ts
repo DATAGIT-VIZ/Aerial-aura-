@@ -14,18 +14,18 @@ export const business = {
 
   // ── Legal notice (Impressum). Swiss law requires these for any business selling online.
   /** REQUIRED. Owner's full name, or the registered company name. */
-  legalName: '',
+  legalName: 'Sydney Soares',
   /** Optional. e.g. 'Sole proprietorship' or 'GmbH'. */
   legalForm: '',
   /** REQUIRED. Street and number, e.g. 'Musterstrasse 12'. */
-  street: '',
+  street: 'Schwerzenbachstrasse 43',
   /** REQUIRED. Postcode and town, e.g. '3011 Bern'. */
-  postcodeCity: '',
+  postcodeCity: '8117 Fällanden',
   /** REQUIRED. Canton of the business address, e.g. 'Bern'. Sets the court in the terms. */
-  canton: '',
+  canton: 'Zurich',
   country: 'Switzerland',
   /** REQUIRED. Public contact email. Must be a working inbox. */
-  email: '',
+  email: 'sydneymsoares12@gmail.com',
   /** Optional. International format, e.g. '+41 79 123 45 67'. */
   phone: '',
   /** Only if registered: Swiss business ID, e.g. 'CHE-123.456.789'. */
