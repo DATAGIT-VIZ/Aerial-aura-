@@ -8,7 +8,7 @@ function resolveSiteUrl(): string {
   if (vercel) return `https://${vercel}`;
   const netlify = process.env.URL; // set by Netlify builds
   if (netlify) return netlify.replace(/\/$/, '');
-  return 'https://aerialaura.ch';
+  return 'https://aerialaurastudio.com';
 }
 
 export const SITE_URL = resolveSiteUrl();

@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { business, whatsappLink } from '@/lib/business';
+
+const ext = { target: '_blank', rel: 'noopener noreferrer' } as const;
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -63,32 +66,15 @@ export default function Footer() {
           </nav>
         </div>
 
-        {/* Connect */}
+        {/* Connect: each link only shows once its detail is filled in (lib/business.ts) */}
         <div className="footer-col">
           <h3 className="footer-col__label">Connect</h3>
           <nav className="footer-nav">
-            <a href="mailto:hello@aerialaura.ch">hello@aerialaura.ch</a>
-            <a
-              href="https://wa.me/41XXXXXXXXX"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              WhatsApp
-            </a>
-            <a
-              href="https://instagram.com/aerialaura"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Instagram
-            </a>
-            <a
-              href="https://youtube.com/@aerialaura"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              YouTube
-            </a>
+            {business.email && <a href={`mailto:${business.email}`}>{business.email}</a>}
+            {business.whatsapp && <a href={whatsappLink()} {...ext}>WhatsApp</a>}
+            {business.instagram && <a href={business.instagram} {...ext}>Instagram</a>}
+            {business.youtube && <a href={business.youtube} {...ext}>YouTube</a>}
+            <Link href="/contact">Enquiry form</Link>
           </nav>
         </div>
 
@@ -96,7 +82,7 @@ export default function Footer() {
 
       {/* ── Bottom bar ── */}
       <div className="footer-bar">
-        <span>&copy;&nbsp;{year} Aerial Aura. All rights reserved.</span>
+        <span>&copy;&nbsp;{year} {business.brand}. All rights reserved.</span>
         <span className="footer-bar__hud" aria-hidden="true">
           SPD&nbsp;0&nbsp;&middot;&nbsp;ALT&nbsp;0&nbsp;&middot;&nbsp;STANDBY
         </span>
@@ -104,6 +90,8 @@ export default function Footer() {
           <Link href="/legal/privacy">Privacy</Link>
           <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
           <Link href="/legal/terms">Terms</Link>
+          <span aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+          <Link href="/legal/notice">Legal notice</Link>
         </span>
       </div>
 

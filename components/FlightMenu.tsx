@@ -1,6 +1,5 @@
 import Link from 'next/link';
-
-const WHATSAPP = '41XXXXXXXXX';
+import { business, whatsappLink, formatPrice, priceVatNote } from '@/lib/business';
 
 const packages = [
   {
@@ -9,9 +8,9 @@ const packages = [
     name: 'Social Reel',
     desc: 'A single-location flight built for Instagram and Shorts — fast turnaround, high-impact cuts.',
     specs: ['1 location', '2H flight window', '3 vertical edits'],
-    price: 'CHF —',
+    price: formatPrice(business.prices.socialReel),
     turnaround: '48H turnaround',
-    waMessage: "Hi%2C+I%27m+interested+in+the+Social+Reel+package.",
+    waMessage: "Hi, I'm interested in the Social Reel package.",
   },
   {
     course: '02',
@@ -19,9 +18,9 @@ const packages = [
     name: 'Real Estate / Brand',
     desc: 'Half-day cinematic walkthrough with aerial stills, built to sell a space or a story.',
     specs: ['Half-day shoot', '1 long-form film', '3 cutdowns'],
-    price: 'CHF —',
+    price: formatPrice(business.prices.realEstateBrand),
     turnaround: '5-day turnaround',
-    waMessage: "Hi%2C+I%27m+interested+in+the+Real+Estate+%2F+Brand+package.",
+    waMessage: "Hi, I'm interested in the Real Estate / Brand package.",
   },
   {
     course: '03',
@@ -29,9 +28,9 @@ const packages = [
     name: 'Full Wedding Coverage',
     desc: 'Ground and aerial coverage across the full day — ceremony flyover, highlight film, raw archive.',
     specs: ['Full-day coverage', 'Ground + air', 'Highlight film'],
-    price: 'CHF —',
+    price: formatPrice(business.prices.fullWedding),
     turnaround: '3-week turnaround',
-    waMessage: "Hi%2C+I%27m+interested+in+the+Full+Wedding+Coverage+package.",
+    waMessage: "Hi, I'm interested in the Full Wedding Coverage package.",
   },
 ];
 
@@ -75,18 +74,31 @@ export default function FlightMenu() {
               {/* CTA column */}
               <div className="menu__cta-col">
                 <div className="menu__price-block">
-                  <span className="menu__from">From</span>
-                  <span className="menu__price">{pkg.price}</span>
+                  {pkg.price ? (
+                    <>
+                      <span className="menu__from">From</span>
+                      <span className="menu__price">{pkg.price}</span>
+                      {priceVatNote && <span className="menu__from">{priceVatNote}</span>}
+                    </>
+                  ) : (
+                    <span className="menu__price menu__price--quote">On request</span>
+                  )}
                   <span className="menu__turnaround">{pkg.turnaround}</span>
                 </div>
-                <Link
-                  href={`https://wa.me/${WHATSAPP}?text=${pkg.waMessage}`}
-                  className="btn btn--solid menu__book"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Book this package →
-                </Link>
+                {whatsappLink() ? (
+                  <Link
+                    href={whatsappLink(pkg.waMessage)}
+                    className="btn btn--solid menu__book"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Book this package →
+                  </Link>
+                ) : (
+                  <Link href="/contact" className="btn btn--solid menu__book">
+                    Book this package →
+                  </Link>
+                )}
               </div>
             </div>
           ))}

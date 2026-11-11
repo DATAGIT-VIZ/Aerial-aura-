@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getLenis } from '@/lib/lenis';
+import { business } from '@/lib/business';
 
 const LINKS = [
   { href: '/work',     label: 'Work' },
@@ -70,7 +71,9 @@ export default function Nav() {
         {/* Phone/tablet menu only */}
         <div className="nav__panel-foot">
           <Link href="/contact" className="btn btn--solid" onClick={closeMenu}>Book a Shoot</Link>
-          <a href="mailto:hello@aerialaura.ch" className="nav__panel-mail">hello@aerialaura.ch</a>
+          {business.email && (
+            <a href={`mailto:${business.email}`} className="nav__panel-mail">{business.email}</a>
+          )}
         </div>
       </div>
 

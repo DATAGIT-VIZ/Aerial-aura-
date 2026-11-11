@@ -1,14 +1,26 @@
+import Image from 'next/image';
+import { business } from '@/lib/business';
+
 export default function About() {
   return (
     <section className="section about" id="about">
       <div className="wrap about__grid">
 
-        {/* Portrait placeholder — swap src when photo is ready */}
+        {/* Pilot portrait: set pilotPhoto in lib/business.ts, otherwise the HUD graphic shows */}
         <div className="about__visual" aria-hidden="true">
           <span className="about__corner about__corner--tl" />
           <span className="about__corner about__corner--tr" />
           <span className="about__corner about__corner--bl" />
           <span className="about__corner about__corner--br" />
+          {business.pilotPhoto ? (
+            <Image
+              src={business.pilotPhoto}
+              alt=""
+              fill
+              sizes="(max-width: 820px) 100vw, 40vw"
+              className="about__photo"
+            />
+          ) : (
           <div className="about__photo-placeholder">
             <svg viewBox="0 0 360 480" className="about__svg">
               <line x1="0"   y1="240" x2="360" y2="240" stroke="var(--line)" strokeWidth="0.6" />
@@ -20,8 +32,8 @@ export default function About() {
               <circle cx="180" cy="240" r="4" fill="var(--copper)" />
               <circle cx="180" cy="240" r="1.5" fill="var(--paper)" />
             </svg>
-            <span className="about__photo-label">Portrait · Pending</span>
           </div>
+          )}
           <span className="about__vl about__vl--tl">46.9°N</span>
           <span className="about__vl about__vl--tr">7.4°E</span>
           <span className="about__vl about__vl--bl">ALT 118M</span>
@@ -37,7 +49,7 @@ export default function About() {
           </blockquote>
 
           <p className="about__body">
-            Trained and working as a chef in Switzerland, [Pilot Name] picked up a drone to
+            Trained and working as a chef in Switzerland, {business.pilotName || 'the pilot behind Aerial Aura'} picked up a drone to
             unwind between services — and it took over. What began as freestyle clips for friends
             turned into wedding flyovers, real estate walkthroughs and brand films shared with a
             growing audience on YouTube and Instagram. Still cooking. Flying a lot more now.
