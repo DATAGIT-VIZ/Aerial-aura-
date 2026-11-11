@@ -1033,6 +1033,16 @@ a { color: inherit; text-decoration: none; }
 }
 /* Spam trap: kept off-screen rather than display:none, which some bots skip */
 .contact__trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.contact__form-privacy { color: var(--dim); font-size: 0.78rem; line-height: 1.6; margin-top: -0.3em; }
+.contact__form-privacy a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.contact__form-privacy a:hover { color: var(--paper); }
+.contact-page__mail { margin-top: 1.6em; color: var(--dim); font-size: 0.9rem; }
+.contact-page__mail a { color: var(--paper); text-decoration: underline; text-underline-offset: 3px; }
+.menu__price--quote { font-size: clamp(1.2rem, 1.7vw, 1.4rem); }
+.about__photo { object-fit: cover; }
+.legal-page__list { color: var(--dim); font-size: 0.94rem; line-height: 1.8; margin: 0 0 0.9em 1.1em; }
+.legal-page__list li { margin-bottom: 0.5em; }
+.legal-page__list strong { color: var(--paper); font-weight: 500; }
 .contact__sent {
   display: flex; flex-direction: column; align-items: flex-start; gap: 1.2em;
   padding: 2.4em 2em; border: 1px solid var(--line); background: var(--panel);

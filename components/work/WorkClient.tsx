@@ -66,6 +66,7 @@ function Lightbox({ item, onClose }: { item: PortfolioItem; onClose: () => void 
               thumbnailTime={item.muxThumbnailTime ?? 0}
               metadata={{ video_title: item.title }}
               accentColor="#C99A43"
+              disableCookies
               style={{ width: '100%', height: '100%', aspectRatio: '16 / 9' }}
             />
           ) : (

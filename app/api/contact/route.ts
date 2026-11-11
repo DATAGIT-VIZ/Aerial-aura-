@@ -3,13 +3,15 @@
 // Environment variables (set in the host's dashboard, never in the code):
 //   RESEND_API_KEY      required. Without it the form answers "not configured" and the
 //                       page tells visitors to use email or WhatsApp instead.
-//   CONTACT_TO_EMAIL    where enquiries go. Defaults to hello@aerialaura.ch.
+//   CONTACT_TO_EMAIL    where enquiries go. Defaults to the email in lib/business.ts.
 //   CONTACT_FROM_EMAIL  sender, on a domain verified in Resend,
-//                       e.g. "Aerial Aura Website <website@aerialaura.ch>".
+//                       e.g. "Aerial Aura Website <website@aerialaurastudio.com>".
 //                       Defaults to Resend's test sender, which only delivers to the
 //                       Resend account owner's own address.
 
-const TO   = process.env.CONTACT_TO_EMAIL   || 'hello@aerialaura.ch';
+import { business } from '@/lib/business';
+
+const TO   = process.env.CONTACT_TO_EMAIL   || business.email;
 const FROM = process.env.CONTACT_FROM_EMAIL || 'Aerial Aura Website <onboarding@resend.dev>';
 
 const TYPES = new Set(['', 'Wedding', 'Real Estate', 'Brand', 'Freestyle', 'Other']);
@@ -77,7 +79,7 @@ export async function POST(request: Request) {
   if (rateLimited(ip)) return done(429, { ok: false, error: 'rate_limited' });
 
   const key = process.env.RESEND_API_KEY;
-  if (!key) return done(503, { ok: false, error: 'not_configured' });
+  if (!key || !TO) return done(503, { ok: false, error: 'not_configured' });
 
   const rows: [string, string][] = [
     ['Name', name], ['Email', email], ['Project type', type || '—'], ['Shoot date', date || '—'],

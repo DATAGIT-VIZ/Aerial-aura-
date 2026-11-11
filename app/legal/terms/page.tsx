@@ -1,6 +1,8 @@
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
+import LegalContact from '@/components/LegalContact';
+import { business, operatorName } from '@/lib/business';
 
 export const metadata: Metadata = {
   title: 'Terms of Engagement — Aerial Aura',
@@ -15,7 +17,7 @@ export default function TermsPage() {
           <header className="legal-page__header">
             <p className="eyebrow">Legal</p>
             <h1 className="display legal-page__title">Terms of Engagement</h1>
-            <p className="legal-page__date">Last updated: September 2026</p>
+            <p className="legal-page__date">Last updated: November 2026</p>
           </header>
 
           <div className="legal-page__body">
@@ -41,10 +43,14 @@ export default function TermsPage() {
             <p>The pilot carries full UAV third-party liability insurance. Aerial Aura&apos;s liability is limited to the value of the agreed project fee. We are not liable for consequential losses (missed listing deadlines, etc.).</p>
 
             <h2>8. Governing law</h2>
-            <p>These terms are governed by Swiss law. Any disputes are subject to the jurisdiction of the courts of the canton where the operator is registered.</p>
+            <p>
+              These terms are governed by Swiss law. Disputes are subject to the jurisdiction of the
+              courts {business.canton ? <>of the Canton of {business.canton}</> : <>at the registered address of {operatorName}</>}.
+              Mandatory consumer rules on jurisdiction remain unaffected.
+            </p>
 
             <h2>9. Contact</h2>
-            <p>Questions about these terms: <a href="mailto:hello@aerialaura.ch">hello@aerialaura.ch</a>.</p>
+            <p>Questions about these terms: <LegalContact />.</p>
           </div>
         </div>
       </main>
