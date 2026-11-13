@@ -37,7 +37,7 @@ export const business = {
 
   // ── Contact channels
   /** Digits only, with country code, e.g. '41791234567'. Empty hides every WhatsApp button. */
-  whatsapp: '',
+  whatsapp: '41762266467',
   /** Full profile URLs, e.g. 'https://instagram.com/handle'. Empty hides the link. */
   instagram: '',
   youtube: '',
